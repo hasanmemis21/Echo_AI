@@ -1,3 +1,4 @@
+// src/pages/HomePage.js
 import React, { useState } from 'react';
 import EmotionInput from '../EmotionInput';
 
@@ -7,23 +8,44 @@ const HomePage = () => {
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Duygu Analizi (Metin + Yüz + Ses)</h1>
+
       <EmotionInput result={result} setResult={setResult} />
 
-      {/* İsteğe bağlı olarak ayrıntılı metin sonuçlarını da gösterebilirsiniz */}
+      {/* Detaylı kanal sonuçları */}
       {result && (
         <div style={{ marginTop: '1.5rem' }}>
           <h3>🧠 Detaylı Sonuçlar:</h3>
-          {result.emotions.text && (
-            <p>Metin: {result.emotions.text.label} (%{result.emotions.text.score * 100})</p>
+
+          {/* Metin kanalı */}
+          {result.channels?.text && (
+            <p>
+              <strong>Metin:</strong> {result.channels.text.label}{' '}
+              (%{Math.round(result.channels.text.score * 100)})
+            </p>
           )}
-          {result.emotions.face && (
-            <p>Yüz: {result.emotions.face.label} (%{result.emotions.face.score * 100})</p>
+
+          {/* Yüz kanalı */}
+          {result.channels?.face && (
+            <p>
+              <strong>Yüz:</strong> {result.channels.face.label}{' '}
+              (%{Math.round(result.channels.face.score * 100)})
+            </p>
           )}
-          {result.emotions.audio && (
-            <p>Ses: {result.emotions.audio.label} (%{result.emotions.audio.score * 100})</p>
+
+          {/* Ses kanalı */}
+          {result.channels?.audio && (
+            <p>
+              <strong>Ses:</strong> {result.channels.audio.label}{' '}
+              (%{Math.round(result.channels.audio.score * 100)})
+            </p>
           )}
+
+          {/* Füzyon sonucu */}
           {result.fused_emotion && (
-            <p>Füzyon: {result.fused_emotion.label} (%{result.fused_emotion.score * 100})</p>
+            <p>
+              <strong>Füzyon:</strong> {result.fused_emotion.label}{' '}
+              (%{Math.round(result.fused_emotion.score * 100)})
+            </p>
           )}
         </div>
       )}
