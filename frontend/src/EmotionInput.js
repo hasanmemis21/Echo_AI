@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { BACKEND_URL } from './config';
+import { BACKEND_URL } from './config'; // merkezi adres
 
 const EmotionInput = ({ text, setResult }) => {
   const videoRef = useRef(null);
@@ -24,7 +24,9 @@ const EmotionInput = ({ text, setResult }) => {
 
       const response = await fetch(`${BACKEND_URL}/api/analyze`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           text: text || null,
           face: base64Image,
@@ -58,10 +60,18 @@ const EmotionInput = ({ text, setResult }) => {
       <button onClick={startCamera}>Kamerayı Aç</button>
       <video ref={videoRef} autoPlay style={{ width: "300px", marginTop: "1rem" }}></video>
       <div>
-        <button onClick={() => captureAndAnalyze(false)} disabled={loading} style={{ marginTop: "1rem", marginRight: "0.5rem" }}>
+        <button
+          onClick={() => captureAndAnalyze(false)}
+          disabled={loading}
+          style={{ marginTop: "1rem", marginRight: "0.5rem" }}
+        >
           {loading ? "Analiz Ediliyor..." : "Kareyi Yakala ve Analiz Et"}
         </button>
-        <button onClick={() => captureAndAnalyze(true)} disabled={loading} style={{ marginTop: "1rem" }}>
+        <button
+          onClick={() => captureAndAnalyze(true)}
+          disabled={loading}
+          style={{ marginTop: "1rem" }}
+        >
           {loading ? "Ses Analizi Yapılıyor..." : "Mikrofonla Ses Analizi Yap"}
         </button>
       </div>
