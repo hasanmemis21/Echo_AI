@@ -1,35 +1,50 @@
-# emotion_analysis/audio.py
+# app/emotion_analysis/audio.py
 
+import io, uuid, logging
+from typing import Dict
 import sounddevice as sd
 from scipy.io.wavfile import write
-import uuid
-import os
 from transformers import pipeline
 
-# Hugging Face modelini yükle
-audio_classifier = pipeline("audio-classification", model="superb/hubert-large-superb-er")
+# global cache
+_audio_classifier = None
 
-def record_audio(duration=5, sample_rate=16000):
+def _get_audio_classifier():
+    global _audio_classifier
+    if _audio_classifier is None:
+        _audio_classifier = pipeline(
+            "audio-classification",
+            model="superb/hubert-large-superb-er",
+            device=-1
+        )
+        logging.info("Audio classifier loaded")
+    return _audio_classifier
+
+def record_audio(duration: float = 5.0, sample_rate: int = 16000) -> bytes:
     """
-    Mikrofondan ses kaydı alır ve geçici bir .wav dosyasına kaydeder.
+    Mikrofon kaydını ham bytes olarak döner, disk I/O olmaz.
     """
     recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1)
     sd.wait()
-    file_name = f"temp_audio_{uuid.uuid4().hex}.wav"
-    write(file_name, sample_rate, recording)
-    return file_name
-def analyze_audio_emotion(duration=5):
-    """
-    Mikrofondan alınan sesi kaydedip duyguyu analiz eder.
-    """
-    audio_path = record_audio(duration)
-    result = audio_classifier(audio_path)
-    label = result[0]['label'].lower()
-    score = round(result[0]['score'], 3)
+    # WAV header + veri
+    bio = io.BytesIO()
+    write(bio, sample_rate, recording)
+    return bio.getvalue()
 
-    os.remove(audio_path)
-
-    # Emin değilse nötr olarak ata
-    if score < 0.90:
-        return {"label": "nötr", "score": score}
-    return {"label": label, "score": score}
+def analyze_audio_emotion(duration: float = 5.0) -> Dict[str, float]:
+    """
+    Ham bytes üzerinden duygu analizi.
+    """
+    try:
+        data = record_audio(duration)
+        # pipeline, buffer desteği isterse: bir temp file yaratmak yerine:
+        classifier = _get_audio_classifier()
+        result = classifier(data)
+        label = result[0]["label"].lower()
+        score = round(result[0]["score"], 3)
+        if score < 0.90:
+            label = "nötr"
+        return {"label": label, "score": score}
+    except Exception as e:
+        logging.error("Audio emotion error: %s", e)
+        return {"label": "error", "score": 0.0}

@@ -1,41 +1,51 @@
-import requests
+# app/music_recommender.py
+
 import os
+from dotenv import load_dotenv
+from googleapiclient.discovery import build
+from typing import List, Dict, Any
 
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")  # .env dosyasından alınır
+load_dotenv()  # .env içinden YOUTUBE_API_KEY’i alacak
 
-def search_youtube_video(query):
-    search_url = "https://www.googleapis.com/youtube/v3/search"
-    params = {
-        "part": "snippet",
-        "q": query,
-        "key": YOUTUBE_API_KEY,
-        "type": "video",
-        "maxResults": 1
-    }
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+if not YOUTUBE_API_KEY:
+    raise RuntimeError("YOUTUBE_API_KEY environment variable is not set")
 
-    response = requests.get(search_url, params=params)
-    data = response.json()
+# YouTube client
+youtube = build("youtube", "v3", developerKey=YOUTUBE_API_KEY)
 
-    if "items" in data and len(data["items"]) > 0:
-        video_id = data["items"][0]["id"]["videoId"]
-        return f"https://www.youtube.com/embed/{video_id}"
-    else:
-        return None
+# Duygu etiketini arama sorgusuna çevirme
+_EMOTION_QUERIES: Dict[str, str] = {
+    "mutluluk":  "mutluluk müziği",
+    "üzüntü":    "hüzünlü müzik",
+    "öfke":      "öfkeli müzik",
+    "korku":     "korku atmosfer müziği",
+    "şaşkınlık": "şaşkınlık duygusu müziği",
+    "tiksinme":  "tiksinme duygusu müziği",
+    "nötr":      "dingin müzik"
+}
 
-
-def recommend_music(emotion_label):
-    emotion_music_keywords = {
-        "mutluluk": "happy upbeat song",
-        "üzüntü": "sad emotional song",
-        "öfke": "angry rock song",
-        "korku": "scary suspense music",
-        "şaşkınlık": "surprise theme music",
-        "tiksinme": "dark experimental music",
-        "nötr": "chill background music",
-        "sevgi": "romantic love song"
-    }
-
-    keyword = emotion_music_keywords.get(emotion_label.lower(), "calm instrumental music")
-    video_url = search_youtube_video(keyword)
-
-    return [video_url] if video_url else ["Müzik bulunamadı."]
+def recommend_music(fused_emotion: Dict[str, Any], max_results: int = 5) -> List[str]:
+    """
+    fused_emotion: {"label": str, "score": float}
+    -> YouTube video ID listesi döner.
+    """
+    label = fused_emotion.get("label", "nötr")
+    query = _EMOTION_QUERIES.get(label, _EMOTION_QUERIES["nötr"])
+    
+    # YouTube arama
+    request = youtube.search().list(
+        q=query,
+        part="id",
+        type="video",
+        maxResults=max_results,
+        videoCategoryId="10"  # 10 = Music
+    )
+    response = request.execute()
+    
+    video_ids = [
+        item["id"]["videoId"]
+        for item in response.get("items", [])
+        if item["id"].get("videoId")
+    ]
+    return video_ids
