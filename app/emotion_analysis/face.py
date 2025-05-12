@@ -1,35 +1,62 @@
 # app/emotion_analysis/face.py
 
-import io, logging
-import numpy as np
-from fer import FER
+import io
+import base64
+import logging
 from typing import Dict
 from PIL import Image
-import base64
-# global cache
+from transformers import pipeline
+
+# Singleton pipeline örneği
 _detector = None
 
-def _get_face_detector():
+# Modelin İngilizce etiketlerini Türkçeye map’leme
+_LABEL_MAP = {
+    "anger":    "öfke",
+    "contempt": "tiksinme",
+    "disgust":  "tiksinme",
+    "fear":     "korku",
+    "happy":    "mutluluk",
+    "sad":      "üzüntü",
+    "surprise": "şaşkınlık",
+    "neutral":  "nötr"
+}
+
+def _get_face_classifier():
     global _detector
     if _detector is None:
-        _detector = FER(mtcnn=True)
-        logging.info("Face detector initialized")
+        # Tek satırda pipeline ile model yükleniyor
+        _detector = pipeline(
+            "image-classification",
+            model="HardlyHumans/Facial-expression-detection",
+            device=-1  # CPU’da çalıştırmak için
+        )
+        logging.info("Face emotion classifier loaded from HuggingFace")
     return _detector
 
 def analyze_face_emotion(base64_image: str) -> Dict[str, float]:
     """
-    Base64 string -> duygu dön
+    Base64 olarak gelen JPEG görüntüsünden duygu etiketini ve skorunu döner.
     """
     try:
-        img = Image.open(io.BytesIO(base64.b64decode(base64_image))).convert("RGB")
-        image_np = np.array(img)
-        detector = _get_face_detector()
-        result = detector.top_emotion(image_np)
-        if result:
-            label, score = result
-            return {"label": label, "score": round(score, 3)}
-        else:
+        # 1) Base64 → PIL Image
+        img_data = base64.b64decode(base64_image)
+        img = Image.open(io.BytesIO(img_data)).convert("RGB")
+
+        # 2) Pipeline ile sınıflandırma
+        classifier = _get_face_classifier()
+        outputs = classifier(img, top_k=1)  # [{'label':'happy', 'score':0.95}]
+        if not outputs:
             return {"label": "no_face", "score": 0.0}
+
+        raw = outputs[0]
+        eng_label = raw["label"].lower()
+        score = round(raw["score"], 3)
+
+        # 3) Türkçeye çevir
+        tur_label = _LABEL_MAP.get(eng_label, "nötr")
+        return {"label": tur_label, "score": score}
+
     except Exception as e:
         logging.error("Face emotion error: %s", e)
         return {"label": "error", "score": 0.0}
