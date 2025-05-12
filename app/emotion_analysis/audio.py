@@ -1,50 +1,31 @@
 # app/emotion_analysis/audio.py
 
-import io, uuid, logging
-from typing import Dict
-import sounddevice as sd
-from scipy.io.wavfile import write
 from transformers import pipeline
+import logging
 
-# global cache
-_audio_classifier = None
+# Global cache
+_asr_pipeline = None
 
-def _get_audio_classifier():
-    global _audio_classifier
-    if _audio_classifier is None:
-        _audio_classifier = pipeline(
-            "audio-classification",
-            model="superb/hubert-large-superb-er",
+def get_asr_pipeline():
+    global _asr_pipeline
+    if _asr_pipeline is None:
+        # wav2vec2 veya tercih ettiğin başka bir model
+        _asr_pipeline = pipeline(
+            "automatic-speech-recognition",
+            model="facebook/wav2vec2-large-xlsr-53",
             device=-1
         )
-        logging.info("Audio classifier loaded")
-    return _audio_classifier
+        logging.info("ASR pipeline yüklendi")
+    return _asr_pipeline
 
-def record_audio(duration: float = 5.0, sample_rate: int = 16000) -> bytes:
+def transcribe_audio(data_bytes: bytes) -> str:
     """
-    Mikrofon kaydını ham bytes olarak döner, disk I/O olmaz.
-    """
-    recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=1)
-    sd.wait()
-    # WAV header + veri
-    bio = io.BytesIO()
-    write(bio, sample_rate, recording)
-    return bio.getvalue()
-
-def analyze_audio_emotion(duration: float = 5.0) -> Dict[str, float]:
-    """
-    Ham bytes üzerinden duygu analizi.
+    Byte olarak gelen wav/webm verisini metne çevirir.
     """
     try:
-        data = record_audio(duration)
-        # pipeline, buffer desteği isterse: bir temp file yaratmak yerine:
-        classifier = _get_audio_classifier()
-        result = classifier(data)
-        label = result[0]["label"].lower()
-        score = round(result[0]["score"], 3)
-        if score < 0.90:
-            label = "nötr"
-        return {"label": label, "score": score}
+        asr = get_asr_pipeline()
+        result = asr(data_bytes)
+        return result.get("text", "")
     except Exception as e:
-        logging.error("Audio emotion error: %s", e)
-        return {"label": "error", "score": 0.0}
+        logging.error("ASR hatası: %s", e)
+        return ""

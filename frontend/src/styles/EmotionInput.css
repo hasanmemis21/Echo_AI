@@ -1,60 +1,59 @@
-/* 3 kontrolü yatay yerleştirir */
-.input-modes {
+.emotion-input {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
-  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  max-width: 600px;
+  margin: auto;
 }
 
-/* Her bir modül kutusuna bir çerçeve ver */
-.mode {
-  flex: 1;
+.emotion-input__text {
+  width: 100%;
+  height: 80px;
   padding: 0.5rem;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  text-align: center;
 }
 
-/* Metin alanı tam genişlikte */
-.mode textarea {
-  width: 100%;
-  height: 100px;
-  resize: none;
-  padding: 0.5rem;
-}
-
-/* Video kutusuna stil */
-.mode video {
-  width: 100%;
-  max-height: 180px;
-  border-radius: 4px;
-}
-
-/* Ses butonu */
-.mode button.record {
-  margin-top: 0.5rem;
-}
-
-/* Ortadaki analiz butonu */
-.analyze-button {
-  display: block;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-}
-
-/* Önerilen videolar grid’i */
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+.emotion-input__controls {
+  display: flex;
   gap: 1rem;
-  margin-top: 1rem;
 }
 
-.video-grid iframe {
-  width: 100%;
-  height: 140px;
+.control-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.control-block button {
+  padding: 0.5rem;
+  background: #007bff;
+  color: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  cursor: pointer;
+}
+
+.control-block button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.emotion-input__analyze {
+  align-self: center;
+  padding: 0.75rem 1.5rem;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.emotion-input__analyze:disabled {
+  background: #aaa;
 }

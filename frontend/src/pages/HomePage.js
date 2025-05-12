@@ -1,56 +1,53 @@
 // src/pages/HomePage.js
 import React, { useState } from 'react';
-import EmotionInput from '../EmotionInput';
+import EmotionInput from '../components/EmotionInput';
+import '../styles/HomePage.css';
 
-const HomePage = () => {
+export default function HomePage() {
   const [result, setResult] = useState(null);
+  const [showMusic, setShowMusic] = useState(false);
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Duygu Analizi (Metin + Yüz + Ses)</h1>
+    <div className="homepage">
+      <h1>Duygu Analizi + Müzik Öneri</h1>
+      <EmotionInput onResults={setResult} />
 
-      <EmotionInput result={result} setResult={setResult} />
-
-      {/* Detaylı kanal sonuçları */}
       {result && (
-        <div style={{ marginTop: '1.5rem' }}>
-          <h3>🧠 Detaylı Sonuçlar:</h3>
+        <div className="results">
+          <div className="details">
+            {result.channels?.text && (
+              <p>📄 Metin: {result.channels.text.label} (%{Math.round(result.channels.text.score*100)})</p>
+            )}
+            {result.channels?.face && (
+              <p>📷 Yüz: {result.channels.face.label} (%{Math.round(result.channels.face.score*100)})</p>
+            )}
+            {result.fused_emotion && (
+              <p>🧠 Füzyon: {result.fused_emotion.label} (%{Math.round(result.fused_emotion.score*100)})</p>
+            )}
+          </div>
 
-          {/* Metin kanalı */}
-          {result.channels?.text && (
-            <p>
-              <strong>Metin:</strong> {result.channels.text.label}{' '}
-              (%{Math.round(result.channels.text.score * 100)})
-            </p>
-          )}
+          <button
+            className="toggle-music"
+            onClick={() => setShowMusic(v => !v)}
+          >
+            {showMusic ? 'Müzikleri Gizle' : 'Müzikleri Göster'}
+          </button>
 
-          {/* Yüz kanalı */}
-          {result.channels?.face && (
-            <p>
-              <strong>Yüz:</strong> {result.channels.face.label}{' '}
-              (%{Math.round(result.channels.face.score * 100)})
-            </p>
-          )}
-
-          {/* Ses kanalı */}
-          {result.channels?.audio && (
-            <p>
-              <strong>Ses:</strong> {result.channels.audio.label}{' '}
-              (%{Math.round(result.channels.audio.score * 100)})
-            </p>
-          )}
-
-          {/* Füzyon sonucu */}
-          {result.fused_emotion && (
-            <p>
-              <strong>Füzyon:</strong> {result.fused_emotion.label}{' '}
-              (%{Math.round(result.fused_emotion.score * 100)})
-            </p>
-          )}
+       {showMusic && result.recommended_music?.length > 0 && (
+  <ul className="music-list">
+    {(result.recommended_music || []).map((id, idx) => (
+      <li key={id || idx}>
+        <button
+          onClick={() => window.open(`https://youtu.be/${id}`, '_blank')}
+        >
+          Müzik {idx + 1}
+        </button>
+      </li>
+    ))}
+  </ul>
+)}
         </div>
       )}
     </div>
   );
-};
-
-export default HomePage;
+}

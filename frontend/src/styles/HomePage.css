@@ -1,0 +1,47 @@
+.homepage {
+  padding: 2rem;
+  background: #f5f7fa;
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.results {
+  margin-top: 2rem;
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.details p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.toggle-music {
+  margin-top: 1rem;
+  background: #17a2b8;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.music-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.music-list li button {
+  width: 100%;
+  padding: 0.5rem;
+  background: #ffc107;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
