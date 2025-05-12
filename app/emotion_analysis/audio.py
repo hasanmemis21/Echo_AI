@@ -1,31 +1,50 @@
 # app/emotion_analysis/audio.py
 
-from transformers import pipeline
+import base64
 import logging
+import io
+from typing import Dict
+from transformers import pipeline
+from pydub import AudioSegment
+import numpy as np
 
-# Global cache
-_asr_pipeline = None
+# --- Audio Classification pipeline ---
+_audio_classifier = None
 
-def get_asr_pipeline():
-    global _asr_pipeline
-    if _asr_pipeline is None:
-        # wav2vec2 veya tercih ettiğin başka bir model
-        _asr_pipeline = pipeline(
-            "automatic-speech-recognition",
-            model="facebook/wav2vec2-large-xlsr-53",
+def get_audio_classifier():
+    global _audio_classifier
+    if _audio_classifier is None:
+        _audio_classifier = pipeline(
+            "audio-classification",
+            model="superb/hubert-large-superb-er",
             device=-1
         )
-        logging.info("ASR pipeline yüklendi")
-    return _asr_pipeline
+        logging.info("Audio classifier loaded")
+    return _audio_classifier
 
-def transcribe_audio(data_bytes: bytes) -> str:
+
+def analyze_audio_emotion_from_base64(b64_string: str, threshold: float = 0.80) -> Dict[str, float]:
     """
-    Byte olarak gelen wav/webm verisini metne çevirir.
+    Decode Base64 audio (webm/blob), convert via pydub+ffmpeg to PCM, then classify.
+    Returns label and score, 'nötr' if below threshold.
     """
     try:
-        asr = get_asr_pipeline()
-        result = asr(data_bytes)
-        return result.get("text", "")
+        # Decode and load with pydub (uses ffmpeg)
+        audio_bytes = base64.b64decode(b64_string)
+        seg = AudioSegment.from_file(io.BytesIO(audio_bytes), format="webm")
+        # Convert to mono numpy array
+        samples = np.array(seg.get_array_of_samples())
+        if seg.channels > 1:
+            samples = samples.reshape((-1, seg.channels)).mean(axis=1).astype(samples.dtype)
+        # Run classifier
+        classifier = get_audio_classifier()
+        result = classifier(samples, sampling_rate=seg.frame_rate)
+        label = result[0]["label"].lower()
+        score = round(result[0]["score"], 3)
+        # Apply user-adjusted threshold
+        if score < threshold:
+            label = "nötr"
+        return {"label": label, "score": score}
     except Exception as e:
-        logging.error("ASR hatası: %s", e)
-        return ""
+        logging.error("Audio emotion error: %s", e)
+        return {"label": "error", "score": 0.0}
