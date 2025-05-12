@@ -5,7 +5,6 @@ import '../styles/HomePage.css';
 
 export default function HomePage() {
   const [result, setResult] = useState(null);
-  const [showMusic, setShowMusic] = useState(false);
 
   return (
     <div className="homepage">
@@ -16,36 +15,35 @@ export default function HomePage() {
         <div className="results">
           <div className="details">
             {result.channels?.text && (
-              <p>📄 Metin: {result.channels.text.label} (%{Math.round(result.channels.text.score*100)})</p>
+              <p>📄 Metin: {result.channels.text.label} (%{Math.round(result.channels.text.score * 100)})</p>
             )}
             {result.channels?.face && (
-              <p>📷 Yüz: {result.channels.face.label} (%{Math.round(result.channels.face.score*100)})</p>
+              <p>📷 Yüz: {result.channels.face.label} (%{Math.round(result.channels.face.score * 100)})</p>
             )}
             {result.fused_emotion && (
-              <p>🧠 Füzyon: {result.fused_emotion.label} (%{Math.round(result.fused_emotion.score*100)})</p>
+              <p>🧠 Füzyon: {result.fused_emotion.label} (%{Math.round(result.fused_emotion.score * 100)})</p>
             )}
           </div>
 
-          <button
-            className="toggle-music"
-            onClick={() => setShowMusic(v => !v)}
-          >
-            {showMusic ? 'Müzikleri Gizle' : 'Müzikleri Göster'}
-          </button>
-
-       {showMusic && result.recommended_music?.length > 0 && (
-  <ul className="music-list">
-    {(result.recommended_music || []).map((id, idx) => (
-      <li key={id || idx}>
-        <button
-          onClick={() => window.open(`https://youtu.be/${id}`, '_blank')}
-        >
-          Müzik {idx + 1}
-        </button>
-      </li>
-    ))}
-  </ul>
-)}
+          {/* Müzikler hemen listeleniyor, gömme player ile */}
+          {result.recommended_music?.length > 0 && (
+            <div className="music-list">
+              {result.recommended_music.map((uri) => {
+                const trackId = uri.split(':').pop();
+                return (
+                  <iframe
+                    key={trackId}
+                    title={trackId}
+                    src={`https://open.spotify.com/embed/track/${trackId}`}
+                    width="100%"
+                    height="80"
+                    frameBorder="0"
+                    allow="encrypted-media"
+                  />
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
