@@ -1,0 +1,14 @@
+:root {
+  /* Temel renk paleti */
+  --color-bg: #f4f7fa;
+  --color-card: #ffffff;
+  --color-primary: #ff5e5e;      /* Öfke / vurgu */
+  --color-secondary: #6beaff;    /* Mutluluk / vurgu */
+  --color-text: #333333;
+  --color-text-light: #555555;
+  --color-button: #4f6ef7;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
