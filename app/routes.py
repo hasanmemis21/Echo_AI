@@ -112,6 +112,7 @@ import logging
 from flask import Blueprint, request, jsonify
 from flask_cors import cross_origin
 from .db import mongo
+import time
 from .emotion_analysis.audio import (
     analyze_audio_emotion_from_base64,
     analyze_audio_emotion_from_bytes
@@ -128,6 +129,8 @@ logging.basicConfig(level=logging.DEBUG)
 @api_bp.route("/analyze", methods=["POST"])
 @cross_origin(origins="*")
 def analyze_emotions():
+    # Zaman ölçümüne başla
+    start = time.monotonic()
     # ffmpeg’in Python’dan erişilebilir olduğunu kontrol et
     logging.debug("FFmpeg yolu (routes): %s", which("ffmpeg"))
 
@@ -163,6 +166,9 @@ def analyze_emotions():
     # 4) Fusion & müzik önerisi
     fused      = fuse_emotions(results)
     music_list = recommend_music(fused) or []
+    # Süreyi hesapla ve logla
+    elapsed = time.monotonic() - start
+    logging.info(f"/analyze tamamlandı in {elapsed:.3f}s")
 
     # Loglama (geçici)
     log_doc = {
@@ -178,7 +184,7 @@ def analyze_emotions():
         "channels": results,
         "fused_emotion": fused,
         "recommended_music": music_list
-    })
+    }), 200, {'X-Response-Time': f'{elapsed:.3f}'}
 
 # Yeni: Feedback endpoint
 @api_bp.route("/feedback", methods=["POST"])
