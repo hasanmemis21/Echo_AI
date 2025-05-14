@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import EmotionInput from '../components/EmotionInput';
 import '../styles/HomePage.css';
@@ -88,3 +89,4 @@ export default function HomePage() {
     </div>
   );
 }
+

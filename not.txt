@@ -1,0 +1,24 @@
+| Proje Bileşeni                        | Sorumlu Modül/Dosya               | Durum              | Notlar / Eksiklikler                                     |
+| ------------------------------------- | --------------------------------- | ------------------ | -------------------------------------------------------- |
+| **1. Çok Modlu Duygu Algılama**       |                                   |                    |                                                          |
+| • Ses Analizi                         | `app/emotion_analysis/audio.py`   | Var                | Özellik çıkarım (enerji, ritim vb.) tam mı?              |
+| • Yüz İfadesi Tanıma                  | `app/emotion_analysis/face.py`    | Var                | Model yükleme ve %85+ doğruluk testi?                    |
+| • Metin Analizi                       | `app/emotion_analysis/text.py`    | Var                | Dil desteği, sıkı hata yönetimi?                         |
+| • Füzyon Algoritması                  | `app/emotion_analysis/fusion.py`  | Var                | Ağırlıklandırma ve çelişki çözümü eksik?                 |
+| **2. Müzik Analiz & Öneri Motoru**    |                                   |                    |                                                          |
+| • Müzik Özellik Çıkarımı              | `app/music_recommender.py`        | Kısmen             | Tonalite, spektral analiz var mı?                        |
+| • Duygu–Müzik Eşleştirme Algoritması  | `app/music_recommender.py`        | Var                | Psikolojik eşleştirme kuralları eklenmeli                |
+| • Öğrenme Mekanizması (Geri Bildirim) | `app/routes.py` (ör. `/feedback`) | Yok                | Frontend’den post edilip DB’ye kaydetmeli                |
+| **3. Web Arayüzü (Frontend)**         |                                   |                    |                                                          |
+| • Gerçek Zamanlı Analiz Göstergeleri  | `src/components/EmotionInput.js`  | Kısmen             | Grafik yok; yükleniyor animasyonu, hata mesajı ekleyelim |
+| • Müzik Çalar                         | `HomePage.js` + HTML5 `<audio>`   | Var                | Çalma kontrolleri ve playlist yönetimi geliştirilmeli    |
+| • Geri Bildirim Mekanizması           | —                                 | Yok                | “Beğendim/Beğenmedim” butonları ve API çağrısı           |
+| **4. Teknik Gereksinimler**           |                                   |                    |                                                          |
+| • 3 sn. altı analiz süresi            | —                                 | Test edilmeli      | Performans ölçümleri eklenecek                           |
+| • Tarayıcı uyumluluğu                 | —                                 | Test edilmeli      | Responsive ve cross-browser test planı                   |
+| • Minimal dış bağımlılık              | `config.js`, `.env`               | Kısmen             | Production ayarları ve CORS/proxy düzeni                 |
+| **5. Kod Kalitesi & Teslimatlar**     |                                   |                    |                                                          |
+| • Modüler, dokümante kod              | —                                 | Gözden geçirilmeli | Docstring ve yorumlar                                    |
+| • Birim testleri                      | —                                 | Yok                | pytest ile temel testler ekleyelim                       |
+| • GitHub depo + README                | —                                 | Hazırlanmalı       | Kurulum, kullanım ve mimari açıklaması                   |
+| • Teknik rapor & demo video           | —                                 | Hazırlanmalı       |                                                          |

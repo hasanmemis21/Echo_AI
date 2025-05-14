@@ -179,3 +179,20 @@ def analyze_emotions():
         "fused_emotion": fused,
         "recommended_music": music_list
     })
+
+# Yeni: Feedback endpoint
+@api_bp.route("/feedback", methods=["POST"])
+@cross_origin(origins="*")
+def feedback():
+    data = request.get_json() or {}
+    track_id = data.get("track_id")
+    liked    = bool(data.get("liked"))
+
+    if not track_id:
+        return jsonify({"error":"track_id eksik"}), 400
+
+    mongo.db.feedback.insert_one({
+        "track_id": track_id,
+        "liked": liked
+    })
+    return jsonify({"status":"ok"})
