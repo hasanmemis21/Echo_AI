@@ -217,3 +217,35 @@
   height: 100%;
   border: none;
 }
+
+/* Responsive: Küçük ekranlarda tek sütun düzeni */
+@media (max-width: 768px) {
+  .results-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .music-list {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    max-width: 100%;
+    margin: 1rem 0;
+  }
+
+  .results {
+    padding: 1rem;
+    margin: 1rem auto;
+    max-width: 100%;
+  }
+
+  .emotion-input, .emotion-section {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .notes-container {
+    display: none;
+  }
+}
