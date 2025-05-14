@@ -1,12 +1,14 @@
-@import '../styles/variables.css';
+@import './variables.css';
 
+/* ———————————————————————————————————————————— */
+/* EmotionInput Component Styles */
 .emotion-input {
-  background: var(--color-card);
+  background: rgba(255,255,255,0.15);
   border-radius: var(--radius);
   padding: 2rem;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow), 0 2px 6px rgba(0,0,0,0.1);
   max-width: 650px;
-  margin: auto;
+  margin: 0 auto 2rem;
   font-family: var(--font-body);
   display: flex;
   flex-direction: column;
@@ -17,10 +19,16 @@
   width: 100%;
   height: 120px;
   padding: 1rem;
+  background: rgba(255,255,255,0.8);
   border: 2px solid var(--color-button);
   border-radius: var(--radius);
   font-size: 1rem;
   resize: vertical;
+  transition: border-color 0.2s;
+}
+.emotion-input__text:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 .emotion-input__controls {
@@ -34,7 +42,6 @@
   flex-direction: column;
   gap: 0.5rem;
 }
-
 .control-block button {
   display: flex;
   align-items: center;
@@ -47,14 +54,13 @@
   border: none;
   border-radius: var(--radius);
   cursor: pointer;
+  box-shadow: var(--shadow), 0 1px 2px rgba(0,0,0,0.05);
   transition: background 0.2s, transform 0.1s;
 }
-
 .control-block button:disabled {
   background: #ccc;
   cursor: not-allowed;
 }
-
 .control-block button:not(:disabled):hover {
   background: var(--color-primary);
   transform: translateY(-2px);
@@ -65,20 +71,18 @@
   padding: 1rem 2rem;
   background: var(--color-primary);
   color: #fff;
-  font-size: 1.1rem;
   font-family: var(--font-heading);
+  font-size: 1.1rem;
   border: none;
   border-radius: var(--radius);
+  box-shadow: var(--shadow), 0 2px 6px rgba(0,0,0,0.1);
   cursor: pointer;
-  box-shadow: var(--shadow);
   transition: background 0.2s, transform 0.1s;
 }
-
 .emotion-input__analyze:disabled {
   background: #aaa;
   cursor: not-allowed;
 }
-
 .emotion-input__analyze:not(:disabled):hover {
   background: var(--color-secondary);
   transform: translateY(-2px);

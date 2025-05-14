@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import EmotionInput from '../components/EmotionInput';
 import '../styles/HomePage.css';
@@ -5,12 +6,34 @@ import '../styles/HomePage.css';
 export default function HomePage() {
   const [result, setResult] = useState(null);
 
+  // 🎼 20 nota için rastgele parametreler oluştur
+  const notes = Array.from({ length: 20 }).map((_, i) => ({
+    id: i,
+    left: Math.random() * 100,              // yatay yüzde konum
+    fallDur: 8 + Math.random() * 6,         // 8–14 saniye arası düşme süresi
+    swayDur: 3 + Math.random() * 3,         // 3–6 saniye arası yalpalanma süresi
+    size: 16 + Math.random() * 24,          // 16–40px arası ikon boyutu
+    color: `hsl(${Math.random() * 360}, 80%, 75%)` // rastgele pastel renk
+  }));
+
   return (
     <div className="homepage">
       {/* 🎼 Arka planda akan notalar */}
       <div className="notes-container">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <span key={i} className="note">♪</span>
+        {notes.map(n => (
+          <span
+            key={n.id}
+            className="note"
+            style={{
+              left: `${n.left}%`,           // CSS değişkenlerini inline set ediyoruz
+              '--fall-dur': `${n.fallDur}s`,
+              '--sway-dur': `${n.swayDur}s`,
+              '--note-size': `${n.size}px`,
+              '--note-color': n.color
+            }}
+          >
+            ♪
+          </span>
         ))}
       </div>
 
