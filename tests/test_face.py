@@ -3,7 +3,7 @@
 import os
 import base64
 import pytest
-from face import _get_face_classifier, analyze_face_emotion, _LABEL_MAP
+from app.emotion_analysis.face import _get_face_classifier, analyze_face_emotion, _LABEL_MAP
 
 def test_get_face_classifier_loads_pipeline():
     """

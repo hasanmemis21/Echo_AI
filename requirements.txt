@@ -1,3 +1,9 @@
+Flask
+flask-pymongo
+flask-cors
+python-dotenv
+pydub
+transformers
 librosa
 soundfile
 pytest

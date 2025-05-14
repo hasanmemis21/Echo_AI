@@ -98,15 +98,16 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContaine
 
 export default function HomePage() {
   const [result, setResult] = useState(null);
+  const [feedbacks, setFeedbacks] = useState({});
 
   // 🎼 20 nota için rastgele parametreler oluştur
   const notes = Array.from({ length: 20 }).map((_, i) => ({
     id: i,
-    left: Math.random() * 100,              // yatay yüzde konum
-    fallDur: 8 + Math.random() * 6,         // 8–14 saniye arası düşme süresi
-    swayDur: 3 + Math.random() * 3,         // 3–6 saniye arası yalpalanma süresi
-    size: 16 + Math.random() * 24,          // 16–40px arası ikon boyutu
-    color: `hsl(${Math.random() * 360}, 80%, 75%)` // rastgele pastel renk
+    left: Math.random() * 100,
+    fallDur: 8 + Math.random() * 6,
+    swayDur: 3 + Math.random() * 3,
+    size: 16 + Math.random() * 24,
+    color: `hsl(${Math.random() * 360}, 80%, 75%)`
   }));
 
   // Grafiğe veri
@@ -117,6 +118,25 @@ export default function HomePage() {
         result.channels.face && { name: 'Yüz', value: Math.round(result.channels.face.score * 100) }
       ].filter(Boolean)
     : [];
+
+  const handleFeedback = async (trackId, liked) => {
+    // Prevent duplicate feedback
+    if (feedbacks[trackId] !== undefined) return;
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          track_id: trackId,
+          emotion: result.fused_emotion.label,
+          liked
+        })
+      });
+      setFeedbacks(prev => ({ ...prev, [trackId]: liked }));
+    } catch (e) {
+      console.error('Feedback gönderilemedi', e);
+    }
+  };
 
   return (
     <div className="homepage">
@@ -147,7 +167,7 @@ export default function HomePage() {
         <EmotionInput onResults={setResult} />
       </div>
 
-      {/* 📊 Analiz Sonuçları ve Müzik Kartları */}
+      {/* 📊 Analiz Sonuçları, Müzik Kartları ve Geri Bildirim */}
       {result && (
         <div className="results">
           <div className="details">
@@ -162,24 +182,38 @@ export default function HomePage() {
             )}
           </div>
 
-          {/* Yatay yerleşim: müzik ve grafik */}
           <div className="results-content">
             <div className="music-list">
-              {result.recommended_music.map((uri) => {
+              {result.recommended_music.map(uri => {
                 const trackId = uri.split(':').pop();
                 return (
-                  <div key={trackId} className="music-card">
+                  <div key={trackId} className="music-card feedback-card">
                     <iframe
                       title={trackId}
                       src={`https://open.spotify.com/embed/track/${trackId}`}
                       allow="autoplay; encrypted-media"
                     />
+                    <div className="feedback-buttons">
+                      <button
+                        onClick={() => handleFeedback(trackId, true)}
+                        disabled={feedbacks[trackId] !== undefined}
+                        className={feedbacks[trackId] === true ? 'liked' : ''}
+                      >👍</button>
+                      <button
+                        onClick={() => handleFeedback(trackId, false)}
+                        disabled={feedbacks[trackId] !== undefined}
+                        className={feedbacks[trackId] === false ? 'disliked' : ''}
+                      >👎</button>
+                    </div>
                   </div>
                 );
               })}
             </div>
 
             <div className="chart-container">
+              <h4 style={{ textAlign: 'center', marginBottom: '8px' }}>
+                Füzyon Duygu: {result.fused_emotion.label.toUpperCase()}
+              </h4>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
