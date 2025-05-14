@@ -24,7 +24,7 @@ Responsive UI: Mobil ve tablet uyumluluğu için media query tabanlı tek sütun
 
 Depoyu klonlayın:
 
-git clone https://github.com/kullanici/duygu-muzik-onerisi.git
+git clone https://github.com/hasanmemis21/Echo_ai.git
 cd duygu-muzik-onerisi
 
 Sanal ortam oluşturun ve aktive edin:
